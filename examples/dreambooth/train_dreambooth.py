@@ -93,6 +93,30 @@ def parse_args(input_args=None):
         help="The prompt used to generate sample outputs to save.",
     )
     parser.add_argument(
+        "--save_sample_prompt1",
+        type=str,
+        default=None,
+        help="The prompt used to generate sample output 1",
+    )
+    parser.add_argument(
+        "--save_sample_prompt2",
+        type=str,
+        default=None,
+        help="The prompt used to generate sample output 2",
+    )
+    parser.add_argument(
+        "--save_sample_prompt3",
+        type=str,
+        default=None,
+        help="The prompt used to generate sample output 3",
+    )
+    parser.add_argument(
+        "--save_sample_prompt4",
+        type=str,
+        default=None,
+        help="The prompt used to generate sample output 4",
+    )
+    parser.add_argument(
         "--save_sample_negative_prompt",
         type=str,
         default=None,
@@ -232,7 +256,7 @@ def parse_args(input_args=None):
         ),
     )
     parser.add_argument("--log_interval", type=int, default=10, help="Log every N steps.")
-    parser.add_argument("--save_interval", type=int, default=10_000, help="Save weights every N steps.")
+    parser.add_argument("--save_interval", type=int, default=10000, help="Save weights every N steps.")
     parser.add_argument("--save_min_steps", type=int, default=0, help="Start saving weights after N steps.")
     parser.add_argument(
         "--mixed_precision",
@@ -426,7 +450,7 @@ def main(args):
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         mixed_precision=args.mixed_precision,
         log_with="tensorboard",
-        project_dir=logging_dir,
+        logging_dir=logging_dir,
     )
 
     logging.basicConfig(
@@ -749,8 +773,17 @@ def main(args):
                 os.makedirs(sample_dir, exist_ok=True)
                 with torch.autocast("cuda"), torch.inference_mode():
                     for i in tqdm(range(args.n_save_sample), desc="Generating samples"):
+                        current_prompt = args.save_sample_prompt						
+                        if (args.save_sample_prompt1 is not None) and (i==0):
+                            current_prompt = args.save_sample_prompt1
+                        if (args.save_sample_prompt2 is not None) and (i==1):
+                            current_prompt = args.save_sample_prompt2
+                        if (args.save_sample_prompt3 is not None) and (i==2):
+                            current_prompt = args.save_sample_prompt3
+                        if (args.save_sample_prompt4 is not None) and (i==3):
+                            current_prompt = args.save_sample_prompt4
                         images = pipeline(
-                            args.save_sample_prompt,
+                            current_prompt,
                             negative_prompt=args.save_sample_negative_prompt,
                             guidance_scale=args.save_guidance_scale,
                             num_inference_steps=args.save_infer_steps,
